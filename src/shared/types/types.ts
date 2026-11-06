@@ -55,6 +55,7 @@ export enum Platform {
 
 export enum ServerType {
     JELLYFIN = 'jellyfin',
+    MUSIC_ASSISTANT = 'musicassistant',
     NAVIDROME = 'navidrome',
     SUBSONIC = 'subsonic',
 }
@@ -87,6 +88,8 @@ export const toServerType = (value?: string): null | ServerType => {
     switch (value?.toLowerCase()) {
         case ServerType.JELLYFIN:
             return ServerType.JELLYFIN;
+        case ServerType.MUSIC_ASSISTANT:
+            return ServerType.MUSIC_ASSISTANT;
         case ServerType.NAVIDROME:
             return ServerType.NAVIDROME;
         case ServerType.SUBSONIC:
@@ -263,6 +266,7 @@ export type ServerListItem = {
     credential: string;
     features?: ServerFeatures;
     id: string;
+    musicAssistantPlayerId?: string;
     name: string;
     ndCredential?: string;
     preferRemoteUrl?: boolean;

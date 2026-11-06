@@ -15,6 +15,7 @@ import {
     isServerLock,
 } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
+import MusicAssistantIcon from '/@/renderer/features/servers/assets/music-assistant.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
@@ -52,12 +53,14 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 
 const SERVER_ICONS: Record<ServerType, string> = {
     [ServerType.JELLYFIN]: JellyfinIcon,
+    [ServerType.MUSIC_ASSISTANT]: MusicAssistantIcon,
     [ServerType.NAVIDROME]: NavidromeIcon,
     [ServerType.SUBSONIC]: SubsonicIcon,
 };
 
 const SERVER_NAMES: Record<ServerType, string> = {
     [ServerType.JELLYFIN]: 'Jellyfin',
+    [ServerType.MUSIC_ASSISTANT]: 'Music Assistant',
     [ServerType.NAVIDROME]: 'Navidrome',
     [ServerType.SUBSONIC]: 'OpenSubsonic',
 };

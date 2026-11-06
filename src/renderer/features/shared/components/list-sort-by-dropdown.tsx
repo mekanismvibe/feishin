@@ -975,6 +975,50 @@ const RADIO_LIST_FILTERS: Partial<
     ],
 };
 
+// Music Assistant reuses the labels of the sorts its controller maps to MA's order_by keys
+type SortOption = { defaultOrder: SortOrder; name: string; value: string };
+const pick = (list: SortOption[] | undefined, values: string[]) =>
+    (list || []).filter((f) => values.includes(f.value));
+
+ALBUM_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = pick(ALBUM_LIST_FILTERS[ServerType.NAVIDROME], [
+    AlbumListSort.ALBUM_ARTIST,
+    AlbumListSort.NAME,
+    AlbumListSort.PLAY_COUNT,
+    AlbumListSort.RANDOM,
+    AlbumListSort.RECENTLY_ADDED,
+    AlbumListSort.RECENTLY_PLAYED,
+    AlbumListSort.YEAR,
+]);
+SONG_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = pick(SONG_LIST_FILTERS[ServerType.NAVIDROME], [
+    SongListSort.ARTIST,
+    SongListSort.DURATION,
+    SongListSort.NAME,
+    SongListSort.PLAY_COUNT,
+    SongListSort.RANDOM,
+    SongListSort.RECENTLY_ADDED,
+    SongListSort.RECENTLY_PLAYED,
+]);
+FOLDER_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = [];
+PLAYLIST_SONG_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = CLIENT_SIDE_SONG_FILTERS;
+ALBUM_ARTIST_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = [
+    ...pick(ALBUM_ARTIST_LIST_FILTERS[ServerType.JELLYFIN], [
+        AlbumArtistListSort.NAME,
+        AlbumArtistListSort.RANDOM,
+        AlbumArtistListSort.RECENTLY_ADDED,
+    ]),
+    ...pick(ALBUM_ARTIST_LIST_FILTERS[ServerType.NAVIDROME], [AlbumArtistListSort.PLAY_COUNT]),
+];
+ARTIST_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] =
+    ALBUM_ARTIST_LIST_FILTERS[ServerType.MUSIC_ASSISTANT];
+GENRE_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = pick(GENRE_LIST_FILTERS[ServerType.JELLYFIN], [
+    GenreListSort.NAME,
+]);
+PLAYLIST_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = pick(
+    PLAYLIST_LIST_FILTERS[ServerType.NAVIDROME],
+    [PlaylistListSort.NAME, PlaylistListSort.UPDATED_AT],
+);
+RADIO_LIST_FILTERS[ServerType.MUSIC_ASSISTANT] = [];
+
 const FILTERS: Partial<Record<LibraryItem, any>> = {
     [LibraryItem.ALBUM]: ALBUM_LIST_FILTERS,
     [LibraryItem.ALBUM_ARTIST]: ALBUM_ARTIST_LIST_FILTERS,

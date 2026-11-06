@@ -35,6 +35,7 @@ export enum LibraryItem {
 
 export enum ServerType {
     JELLYFIN = 'jellyfin',
+    MUSIC_ASSISTANT = 'musicassistant',
     NAVIDROME = 'navidrome',
     SUBSONIC = 'subsonic',
 }
@@ -91,6 +92,7 @@ export type ServerListItem = {
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
+    musicAssistantPlayerId?: string;
     musicFolderId?: string[];
     name: string;
     preferInstantMix?: boolean;

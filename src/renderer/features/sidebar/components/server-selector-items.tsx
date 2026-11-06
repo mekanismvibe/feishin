@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { controller } from '/@/renderer/api/controller';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
+import MusicAssistantLogo from '/@/renderer/features/servers/assets/music-assistant.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
@@ -165,7 +166,10 @@ export const ServerSelectorItems = () => {
                 const isNavidromeExpired =
                     server.type === ServerType.NAVIDROME && !server.ndCredential;
                 const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
-                const isSubsonicExpired = server.type === ServerType.SUBSONIC && !server.credential;
+                const isSubsonicExpired =
+                    (server.type === ServerType.SUBSONIC ||
+                        server.type === ServerType.MUSIC_ASSISTANT) &&
+                    !server.credential;
                 const isSessionExpired =
                     isNavidromeExpired || isJellyfinExpired || isSubsonicExpired;
 
@@ -174,7 +178,9 @@ export const ServerSelectorItems = () => {
                         ? NavidromeLogo
                         : server.type === ServerType.JELLYFIN
                           ? JellyfinLogo
-                          : OpenSubsonicLogo;
+                          : server.type === ServerType.MUSIC_ASSISTANT
+                            ? MusicAssistantLogo
+                            : OpenSubsonicLogo;
 
                 return (
                     <DropdownMenu.Item
