@@ -1,15 +1,23 @@
+import { useQuery } from '@tanstack/react-query';
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getMusicAssistantPlayers } from '/@/renderer/api/music-assistant/music-assistant-controller';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useCurrentServer, useMpvInitialized, usePlayerStatus } from '/@/renderer/store';
+import {
+    getServerById,
+    useAuthStoreActions,
+    useCurrentServer,
+    useMpvInitialized,
+    usePlayerStatus,
+} from '/@/renderer/store';
 import {
     usePlaybackSettings,
     usePlaybackType,
@@ -23,7 +31,7 @@ import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
-import { PlayerStatus, PlayerType } from '/@/shared/types/types';
+import { PlayerStatus, PlayerType, ServerType } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
@@ -103,6 +111,29 @@ export const useAudioDevices = (playbackType: PlayerType) => {
     return audioDevices;
 };
 
+const MusicAssistantPlayerSelect = ({ disabled }: { disabled: boolean }) => {
+    const server = useCurrentServer();
+    const { updateServer } = useAuthStoreActions();
+    const { data: players } = useQuery({
+        queryFn: () => getMusicAssistantPlayers(getServerById(server.id)),
+        queryKey: [server.id, 'musicAssistantPlayers'],
+    });
+
+    return (
+        <Select
+            clearable
+            data={(players || []).map((player) => ({
+                label: player.name,
+                value: player.player_id,
+            }))}
+            disabled={disabled}
+            onChange={(e) => updateServer(server.id, { musicAssistantPlayerId: e || undefined })}
+            placeholder={t('setting.musicAssistantPlayer', { context: 'placeholder' })}
+            value={server.musicAssistantPlayerId ?? null}
+        />
+    );
+};
+
 export const AudioSettings = memo(() => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
@@ -170,6 +201,15 @@ export const AudioSettings = memo(() => {
             isHidden: !isElectron() && !isJukeboxSupported,
             note: status === PlayerStatus.PLAYING ? t('common.playerMustBePaused') : undefined,
             title: t('setting.audioPlayer'),
+        },
+        {
+            control: <MusicAssistantPlayerSelect disabled={status === PlayerStatus.PLAYING} />,
+            description: t('setting.musicAssistantPlayer', { context: 'description' }),
+            isHidden:
+                currentServer?.type !== ServerType.MUSIC_ASSISTANT ||
+                settings.type !== PlayerType.JUKEBOX,
+            note: status === PlayerStatus.PLAYING ? t('common.playerMustBePaused') : undefined,
+            title: t('setting.musicAssistantPlayer'),
         },
         {
             control: (

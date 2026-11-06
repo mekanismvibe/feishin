@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import styles from '/@/renderer/features/action-required/components/server-required.module.css';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
+import MusicAssistantLogo from '/@/renderer/features/servers/assets/music-assistant.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
@@ -92,7 +93,10 @@ function ServerSelector() {
                 const isNavidromeExpired =
                     server.type === ServerType.NAVIDROME && !server.ndCredential;
                 const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
-                const isSubsonicExpired = server.type === ServerType.SUBSONIC && !server.credential;
+                const isSubsonicExpired =
+                    (server.type === ServerType.SUBSONIC ||
+                        server.type === ServerType.MUSIC_ASSISTANT) &&
+                    !server.credential;
                 const isSessionExpired =
                     isNavidromeExpired || isJellyfinExpired || isSubsonicExpired;
 
@@ -101,7 +105,9 @@ function ServerSelector() {
                         ? NavidromeLogo
                         : server.type === ServerType.JELLYFIN
                           ? JellyfinLogo
-                          : OpenSubsonicLogo;
+                          : server.type === ServerType.MUSIC_ASSISTANT
+                            ? MusicAssistantLogo
+                            : OpenSubsonicLogo;
 
                 return (
                     <Button

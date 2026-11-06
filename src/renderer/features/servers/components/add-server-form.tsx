@@ -10,6 +10,7 @@ import {
     isServerLock,
 } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
+import MusicAssistantIcon from '/@/renderer/features/servers/assets/music-assistant.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
@@ -82,6 +83,10 @@ const SERVER_TYPES: Record<ServerType, ServerDetails> = {
         icon: JellyfinIcon,
         name: 'Jellyfin',
     },
+    [ServerType.MUSIC_ASSISTANT]: {
+        icon: MusicAssistantIcon,
+        name: 'Music Assistant',
+    },
     [ServerType.NAVIDROME]: {
         icon: NavidromeIcon,
         name: 'Navidrome',
@@ -91,6 +96,8 @@ const SERVER_TYPES: Record<ServerType, ServerDetails> = {
         name: 'OpenSubsonic',
     },
 };
+
+const MUSIC_ASSISTANT_DEFAULT_URL = 'http://homeassistant.local:8095';
 
 const ALL_SERVERS = Object.keys(SERVER_TYPES).map((serverType) => {
     const info = SERVER_TYPES[serverType];
@@ -134,8 +141,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const showQuickConnect =
         form.values.type === ServerType.JELLYFIN && signInMethod === 'quickConnect';
 
+    const isMusicAssistant = form.values.type === ServerType.MUSIC_ASSISTANT;
     const isSubmitDisabled =
-        !form.values.name || !form.values.url || (!showQuickConnect && !form.values.username);
+        !form.values.name ||
+        !form.values.url ||
+        (!showQuickConnect && !form.values.username && !(isMusicAssistant && form.values.password));
 
     const {
         code: quickConnectCode,
@@ -310,6 +320,18 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         onChange={(value) => {
                             form.setFieldValue('type', value);
                             if (value !== ServerType.JELLYFIN) stopQuickConnect();
+
+                            // Prefill MA's default address (Home Assistant add-on, port 8095) while
+                            // the URL is still untouched, and take it back when switching away
+                            const url = form.values.url.trim();
+                            if (
+                                value === ServerType.MUSIC_ASSISTANT &&
+                                ['', 'http://', 'https://'].includes(url)
+                            ) {
+                                form.setFieldValue('url', MUSIC_ASSISTANT_DEFAULT_URL);
+                            } else if (url === MUSIC_ASSISTANT_DEFAULT_URL) {
+                                form.setFieldValue('url', 'https://');
+                            }
                         }}
                         p="md"
                         value={form.values.type}
@@ -379,13 +401,17 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 label={t('form.addServer.input', {
                                     context: 'username',
                                 })}
-                                required
+                                required={!isMusicAssistant}
                                 {...form.getInputProps('username')}
                             />
                             <PasswordInput
                                 description={
-                                    form.values.type === ServerType.NAVIDROME &&
-                                    t('form.addServer.input', { context: 'passwordNoSSO' })
+                                    (form.values.type === ServerType.NAVIDROME &&
+                                        t('form.addServer.input', { context: 'passwordNoSSO' })) ||
+                                    (isMusicAssistant &&
+                                        t('form.addServer.input', {
+                                            context: 'passwordMusicAssistant',
+                                        }))
                                 }
                                 label={t('form.addServer.input', {
                                     context: 'password',

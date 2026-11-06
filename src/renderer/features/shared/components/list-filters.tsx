@@ -183,6 +183,10 @@ const FILTERS = {
         [LibraryItem.ALBUM]: JellyfinAlbumFilters,
         [LibraryItem.SONG]: JellyfinSongFilters,
     },
+    [ServerType.MUSIC_ASSISTANT]: {
+        [LibraryItem.ALBUM]: SubsonicAlbumFilters,
+        [LibraryItem.SONG]: SubsonicSongFilters,
+    },
     [ServerType.NAVIDROME]: {
         [LibraryItem.ALBUM]: NavidromeAlbumFilters,
         [LibraryItem.SONG]: NavidromeSongFilters,
